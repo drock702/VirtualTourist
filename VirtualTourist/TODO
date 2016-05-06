@@ -1,0 +1,14 @@
+1. Add a coredata file
+2. Create two view controller scenes
+    A. Travel Locations Map View
+    B. Photo view
+3. Data model with relationships between locations and photos
+4. Map view - does this need to use the logic from the masterviewcontroller??
+    A. Add touch pins
+    B. Save touch positions in context
+    C. Save the map location and zoom in context
+5. Photo view
+    A. A collection of photo URLs from Flickr
+    B. Get photos from Flickr
+    C. Use Insert/Delete for photos
+6. remove the MasterViewController
