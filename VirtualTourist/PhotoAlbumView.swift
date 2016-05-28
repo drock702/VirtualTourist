@@ -67,7 +67,6 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         collectionView.setCollectionViewLayout(layout, animated: true)
-        collectionView.registerClass(PhotoCellForCollectionView.self, forCellWithReuseIdentifier: "PhotoCellForCollectionView")
         
         fetchedResultsController.delegate = self
     }
@@ -173,7 +172,20 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
                 
                 // Now we create a new Location, using the shared Context
 //                _ = Location(dictionary: dictionary, context: self.sharedContext)
-                 _ = Photo(dictionary: photo, context: self.sharedContext)
+                 var newphoto = Photo(dictionary: photo, context: self.sharedContext)
+                    
+                // Get the photo images
+                PhotoGrabber.sharedInstance().getPhotoImageFromDownload(newphoto) { (imageData, errorString)  in
+                        
+                        guard let imageData = imageData else {
+                            print(errorString)
+                            return
+                        }
+                        
+                        let image = UIImage(data: imageData)
+                        newphoto.image = image
+                        self.saveContext()
+                }
                 
             }
             
@@ -216,12 +228,9 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         }()
     
     func configureCell(cell: PhotoCellForCollectionView, photo: Photo) {
-        var placeholderImage = UIImage(named: "placeholder")
-        
-        cell.photoImage.image = nil
+        var placeholderImage = UIImage(named: "PlaceholderImage")
         
         // Set the Movie Poster Image
-        
         if photo.image != nil {
             placeholderImage = photo.image!
         }
@@ -283,6 +292,8 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCellForCollectionView", forIndexPath: indexPath) as! PhotoCellForCollectionView
         
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        
+        print ("Get the cell at index \(indexPath) - the photo is \(photo.description)")
         
         self.configureCell(cell, photo: photo)
         
