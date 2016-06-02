@@ -57,12 +57,12 @@ class Photo : NSManagedObject {
         // After the Core Data work has been taken care of we can init the properties from the
         // dictionary. This works in the same way that it did before we started on Core Data
         url = dictionary[Keys.Url] as! String
-        // TODO: Create the location item here or outside and pass in???
-//        location = dictionary[Keys.Location] as! String
         id = dictionary[Keys.Photo_id] as! String!
         title = dictionary[Keys.Title] as! String!
         height = dictionary[Keys.Height] as! String!
         width = dictionary[Keys.Width] as! String!
+        // DLP - Any reason to store the location?
+//        location = newLocation
     }
     
     var image: UIImage? {

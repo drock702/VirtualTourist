@@ -11,16 +11,14 @@ import UIKit
 
 class PhotoCellForCollectionView: UICollectionViewCell {
     
-//    @IBOutlet weak var photoCellPanel: UIView!
-//    
-//    var photo: String {
-//        set {
-//            self.photo = newValue
-//        }
-//        
-//        get {
-//            return self.photo
-//        }
-//    }
-     @IBOutlet weak var photoImage: UIImageView!
+    @IBOutlet weak var photoImage: UIImageView!
+    
+    var taskToCancelifCellIsReused: NSURLSessionTask? {
+        
+        didSet {
+            if let taskToCancel = oldValue {
+                taskToCancel.cancel()
+            }
+        }
+    }
 }

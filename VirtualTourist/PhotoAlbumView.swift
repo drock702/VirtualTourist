@@ -22,11 +22,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
     // used inside cellForItemAtIndexPath to lower the alpha of selected cells.  You can see how the array
     // works by searchign through the code for 'selectedIndexes'
     var selectedIndexes = [NSIndexPath]()
-    
-    // Keep the changes. We will keep track of insertions, deletions, and updates.
-    var insertedIndexPaths: [NSIndexPath]!
-    var deletedIndexPaths: [NSIndexPath]!
-    var updatedIndexPaths: [NSIndexPath]!
+    var blockOperations: [NSBlockOperation] = []
     
     // Variables for the latitude and longitude for the map.
     var mapLatitude: Double = 200.0
@@ -114,7 +110,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         PhotoGrabber.sharedInstance().pictureSearchByLatitudeLongitude (self.mapLatitude, longitudeValue: self.mapLongitude) { (photos: [[String: AnyObject]]?, errorString: String?) in
             
             self.locationPhotos = photos
-            print ("pictureSearchByLatitudeLongitude returned \(self.locationPhotos!.count) photos")
+            print ("pictureSearchByLatitudeLongitude - lat: \(self.mapLatitude), lon: \(self.mapLongitude) returned \(self.locationPhotos!.count) photos")
             dispatch_async(dispatch_get_main_queue()) {
                 if let error = errorString {
                     print ("There was an error \(error)")
@@ -131,64 +127,29 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
             // Enable the New Collection button
             
             self.newCollectionButton.enabled = true
-            self.collectionView.reloadData()
-            print ("Done retrieving photos")
+//            print ("Done retrieving  \(self.locationPhotos) photos ")
             
-            
-//            guard let photosArray = photos as [[String:AnyObject]]? else {
-//                print(errorString)
-//                return
-//            }
-//            // DLP TEMP
-//            for photo in self.locationPhotos!
-//            {
-//                print ("The photo object = \(photo.description)")
-//                let f = photo["id"] as! String!
-//                print ("The id is \(f)")
-//                print("The f description: \(f)")
-//            }
-//            
-//            let _ = photosArray.map() { (dictionary: [String:AnyObject]) in
-//                //                // Need to create a Location object??    Photo.Keys.Location : annotation.coordinate.longitude
-//                //                // Need to create a Location object??    Location.Keys.Lat : annotation.coordinate.latitude
-//                // Amend Photo constructor to accept a location??  Or create ocatiopn in the Photo
-//                let photo = Photo(dictionary: dictionary, context: self.sharedContext)
-//            }
-//            
-//            self.saveContext()
-//            return 
             // Get a photo to put in collection
             for photo in self.locationPhotos!
             {
-                
-                print ("The photo object = \(photo.description)")
-                //_ = Photo (photo)
-                
-//                let dictionary: [String : AnyObject] = [
-//                    Photo.Keys.Url : photo ["url_m"]
-//                // Need to create a Location object??    Photo.Keys.Location : annotation.coordinate.longitude
-//                // Need to create a Location object??    Location.Keys.Lat : annotation.coordinate.latitude
-//                ]
-                
-                // Now we create a new Location, using the shared Context
-//                _ = Location(dictionary: dictionary, context: self.sharedContext)
-                 var newphoto = Photo(dictionary: photo, context: self.sharedContext)
+                // Now we create a new Photo, using the shared Context
+                var newphoto = Photo(dictionary: photo, context: self.sharedContext)
                     
                 // Get the photo images
                 PhotoGrabber.sharedInstance().getPhotoImageFromDownload(newphoto) { (imageData, errorString)  in
                         
-                        guard let imageData = imageData else {
-                            print(errorString)
-                            return
-                        }
-                        
-                        let image = UIImage(data: imageData)
-                        newphoto.image = image
-                        self.saveContext()
+                    guard let imageData = imageData else {
+                        print(errorString)
+                        return
+                    }
+                    
+                    let image = UIImage(data: imageData)
+                    newphoto.image = image
+                    self.saveContext()
                 }
                 
             }
-            
+            // DLP - is this call necessary?
             CoreDataStackManager.sharedInstance().saveContext()
         }
     }
@@ -196,6 +157,8 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        // Clear the collection?
+        collectionView.reloadData()
         self.refreshPhotos ()
     }
     
@@ -230,49 +193,48 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
     func configureCell(cell: PhotoCellForCollectionView, photo: Photo) {
         var placeholderImage = UIImage(named: "PlaceholderImage")
         
-        // Set the Movie Poster Image
         if photo.image != nil {
             placeholderImage = photo.image!
         }
         
-        cell.photoImage.image = placeholderImage
-        
-        
-//        let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-//        
-//        print ("Photo description: \(photo.description)")
-////        cell.photo = photo.url
-////        print ("Configuring cell for photo: \(cell.photo)")
-//        
-//        // If the cell is "selected" it's color panel is grayed out
-//        // we use the Swift `find` function to see if the indexPath is in the array
-//        
-////        if let index = selectedIndexes.indexOf(indexPath) {
-////            cell.colorPanel.alpha = 0.05
-////        } else {
-////            cell.colorPanel.alpha = 1.0
-////        }
-////        cell.photoViewImage.image = nil
-//        
-//        // Set the Movie Poster Image
-// // DLP - TODO
-////        if photo.image != nil {
-////            placeholderImage = photo.image!
-////        }
-////        
-////        cell.photoImageView.image = placeholderImage
-//        
-//        var tempImage = UIImage(named: "tempPhoto")
-//        
-////        cell.photoViewImage.image = nil
-//        
-//        // Set the Movie Poster Image
-//        
-//        if photo.image != nil {
-//            tempImage = photo.image!
+        // Set the Photo Image
+//        if photo.url == "" {
+//            // placeholderImage will have to be used
 //        }
-//        
-//        cell.photoImage.image = tempImage
+//        else if photo.image != nil {
+//            placeholderImage = photo.image!
+//        }
+//        else {
+        
+            // Download the images
+            let task = PhotoRetriever.sharedInstance().tasktoGetPhotoImage(photo.url) { data, error in
+                
+                if let error = error {
+                    print("Photo image download error: \(error.localizedDescription)")
+                }
+                
+                print ("Retrieved a photo image" )
+                
+                if let data = data {
+                    // Create the image
+                    let image = UIImage(data: data)
+                    
+                    // update the photo, so it gets cached
+                    photo.image = image
+                    
+                    // update the cell on the main thread
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        cell.photoImage!.image = image
+                    }
+                }
+            }
+            
+            // This is the custom property on this cell. See TaskCancelingTableViewCell.swift for details.
+            cell.taskToCancelifCellIsReused = task
+//        }
+        
+        cell.photoImage.image = placeholderImage
     }
 
     
@@ -312,7 +274,6 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         }
         
         // Then reconfigure the cell
-//        configureCell(cell, atIndexPath: indexPath)
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         configureCell(cell, photo: photo)
         
@@ -325,51 +286,97 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
     }
 
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
-        print ("Will change content called")
+        blockOperations.removeAll(keepCapacity: false)
     }
     
     func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+        
+        switch type {
+        case .Insert:
+            blockOperations.append(
+                NSBlockOperation(block: { [weak self] in
+                    if let this = self {
+                        print("Calling to insert section")
+                        this.collectionView!.insertSections(NSIndexSet(index: sectionIndex))
+                    }
+                    })
+            )
+        case .Delete:
+            blockOperations.append(
+                NSBlockOperation(block: { [weak self] in
+                    if let this = self {
+                        print("Calling to delete section")
+                        this.collectionView!.deleteSections(NSIndexSet(index: sectionIndex))
+                    }
+                    })
+            )
+        default:
+            blockOperations.append(
+                NSBlockOperation(block: { [weak self] in
+                    if let this = self {
+                        print("Calling to reload (default) section")
+                        this.collectionView!.reloadSections(NSIndexSet(index: sectionIndex))
+                    }
+                    })
+            )
+        }
     }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         
-        print ("did change called")
-
         switch type {
         case .Insert:
-            print ("... insert")
-            //recordedChanges.append((.Insert,newIndexPath!))
+            blockOperations.append(
+                NSBlockOperation(block: { [weak self] in
+                    if let this = self {
+                        print("Calling to insert object")
+                        this.collectionView!.insertItemsAtIndexPaths([newIndexPath!])
+                    }
+                    })
+            )
         case .Delete:
-            print ("... delete")
-            //recordedChanges.append((.Delete,indexPath!))
-        default:
-            print ("... other")
-            return
+            blockOperations.append(
+                NSBlockOperation(block: { [weak self] in
+                    if let this = self {
+                        print("Calling to delete object")
+                        this.collectionView!.deleteItemsAtIndexPaths([indexPath!])
+                    }
+                    })
+            )
+        case .Update:
+            blockOperations.append(
+                NSBlockOperation(block: { [weak self] in
+                    if let this = self {
+                        print("Calling to reload object")
+                        this.collectionView!.reloadItemsAtIndexPaths([indexPath!])
+                    }
+                    })
+            )
+        case .Move:
+            blockOperations.append(
+                NSBlockOperation(block: { [weak self] in
+                    if let this = self {
+                        print("Calling to move object")
+                        this.collectionView!.moveItemAtIndexPath(indexPath!, toIndexPath: newIndexPath!)
+                    }
+                    })
+            )
         }
     }
     
-    // When endUpdates() is invoked, the table makes the changes visible.
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        print ("content all changed")
         
-//        // rerun all the updates in a single batch
-//        photoAlbumView.performBatchUpdates({
-//            for (type,index) in self.recordedChanges {
-//                switch type {
-//                case .Insert:
-//                    self.photoAlbumView.insertItemsAtIndexPaths([index])
-//                case .Delete:
-//                    self.photoAlbumView.deleteItemsAtIndexPaths([index])
-//                default:
-//                    continue
-//                }
-//            }
-//            }, completion: {done in
-//                dispatch_async(dispatch_get_main_queue(), {
-//                    self.newCollection.enabled = true  // finally reanble the new collection button
-//                })
-//        })
+        collectionView.performBatchUpdates({ () -> Void in
+            for blockOperation in self.blockOperations {
+                blockOperation.start()
+            }
+            }, completion: { (finished) -> Void in
+                print("Calling to remove all")
+                self.blockOperations.removeAll(keepCapacity: false)
+        })
+        
     }
+    
     
     @IBAction func NewCollectionButton(sender: UIBarButtonItem) {
     }

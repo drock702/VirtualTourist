@@ -10,6 +10,7 @@
 		4A26AF161CB0D81E00B8DAF0 /* PhotoGrabber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A26AF151CB0D81E00B8DAF0 /* PhotoGrabber.swift */; settings = {ASSET_TAGS = (); }; };
 		4A26AF181CB2241A00B8DAF0 /* PhotoCellForCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A26AF171CB2241A00B8DAF0 /* PhotoCellForCollectionView.swift */; settings = {ASSET_TAGS = (); }; };
 		4A5B5BAA1CE2F1FE0022EEFB /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A5B5BA91CE2F1FE0022EEFB /* ImageCache.swift */; settings = {ASSET_TAGS = (); }; };
+		4A8AD4AE1CFA6BFF008C59F2 /* PhotoRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A8AD4AD1CFA6BFF008C59F2 /* PhotoRetriever.swift */; settings = {ASSET_TAGS = (); }; };
 		4ADD91061CA25AC700F448CF /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ADD91051CA25AC700F448CF /* Photo.swift */; settings = {ASSET_TAGS = (); }; };
 		4AFB06211C97BF0B0040588E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AFB06201C97BF0B0040588E /* AppDelegate.swift */; };
 		4AFB06231C97BF0B0040588E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AFB06221C97BF0B0040588E /* ViewController.swift */; };
@@ -47,6 +48,7 @@
 		4A26AF151CB0D81E00B8DAF0 /* PhotoGrabber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoGrabber.swift; sourceTree = "<group>"; };
 		4A26AF171CB2241A00B8DAF0 /* PhotoCellForCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCellForCollectionView.swift; sourceTree = "<group>"; };
 		4A5B5BA91CE2F1FE0022EEFB /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		4A8AD4AD1CFA6BFF008C59F2 /* PhotoRetriever.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoRetriever.swift; sourceTree = "<group>"; };
 		4ADD91051CA25AC700F448CF /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		4AFB061D1C97BF0B0040588E /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4AFB06201C97BF0B0040588E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 				4A26AF151CB0D81E00B8DAF0 /* PhotoGrabber.swift */,
 				4A26AF171CB2241A00B8DAF0 /* PhotoCellForCollectionView.swift */,
 				4A5B5BA91CE2F1FE0022EEFB /* ImageCache.swift */,
+				4A8AD4AD1CFA6BFF008C59F2 /* PhotoRetriever.swift */,
 			);
 			path = VirtualTourist;
 			sourceTree = "<group>";
@@ -295,6 +298,7 @@
 				4AFB06571C97C0110040588E /* CoreDataStackManager.swift in Sources */,
 				4A26AF181CB2241A00B8DAF0 /* PhotoCellForCollectionView.swift in Sources */,
 				4AFB06531C97BFF40040588E /* PhotoAlbumView.swift in Sources */,
+				4A8AD4AE1CFA6BFF008C59F2 /* PhotoRetriever.swift in Sources */,
 				4AFB06A31C991CAF0040588E /* Model.xcdatamodeld in Sources */,
 				4AFB06A51C991FE70040588E /* Location.swift in Sources */,
 			);
