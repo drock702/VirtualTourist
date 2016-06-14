@@ -16,14 +16,14 @@ class Location : NSManagedObject {
         static let Name = "name"
         static let Lat = "latitude"
         static let Lon = "longitude"
-//        static let Photos = "photos"
+        static let Photos = "photos"
     }
     
     // 3. We are promoting these four from simple properties, to Core Data attributes
     @NSManaged var name: String
     @NSManaged var latitude: NSNumber
     @NSManaged var longitude: NSNumber
-//    @NSManaged var pictures: NSOrderedSet
+    @NSManaged var photos: [Photo]
     
     // 4. Include this standard Core Data init method.
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {

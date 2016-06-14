@@ -28,6 +28,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
     var mapLatitude: Double = 200.0
     var mapLongitude: Double = 200.0
     var locationPhotos: [[String: AnyObject]]?
+    var currentLocation: Location?
     
     // Core Data Convenience. This will be useful for fetching. And for adding and saving objects as well.
     lazy var sharedContext: NSManagedObjectContext =  {
@@ -134,7 +135,8 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
             {
                 // Now we create a new Photo, using the shared Context
                 var newphoto = Photo(dictionary: photo, context: self.sharedContext)
-                    
+                newphoto.place = self.currentLocation
+                
                 // Get the photo images
                 PhotoGrabber.sharedInstance().getPhotoImageFromDownload(newphoto) { (imageData, errorString)  in
                         
@@ -197,42 +199,32 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
             placeholderImage = photo.image!
         }
         
-        // Set the Photo Image
-//        if photo.url == "" {
-//            // placeholderImage will have to be used
-//        }
-//        else if photo.image != nil {
-//            placeholderImage = photo.image!
-//        }
-//        else {
-        
-            // Download the images
-            let task = PhotoRetriever.sharedInstance().tasktoGetPhotoImage(photo.url) { data, error in
-                
-                if let error = error {
-                    print("Photo image download error: \(error.localizedDescription)")
-                }
-                
-                print ("Retrieved a photo image" )
-                
-                if let data = data {
-                    // Create the image
-                    let image = UIImage(data: data)
-                    
-                    // update the photo, so it gets cached
-                    photo.image = image
-                    
-                    // update the cell on the main thread
-                    
-                    dispatch_async(dispatch_get_main_queue()) {
-                        cell.photoImage!.image = image
-                    }
-                }
+        // Download the images
+        let task = PhotoRetriever.sharedInstance().tasktoGetPhotoImage(photo.url) { data, error in
+            
+            if let error = error {
+                print("Photo image download error: \(error.localizedDescription)")
             }
             
-            // This is the custom property on this cell. See TaskCancelingTableViewCell.swift for details.
-            cell.taskToCancelifCellIsReused = task
-//        }
+            print ("Retrieved a photo image" )
+            
+            if let data = data {
+                // Create the image
+                let image = UIImage(data: data)
+                
+                // update the photo, so it gets cached
+                photo.image = image
+                
+                // update the cell on the main thread
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    cell.photoImage!.image = image
+                }
+            }
+        }
+        
+        // This is the custom property on this cell. See TaskCancelingTableViewCell.swift for details.
+        cell.taskToCancelifCellIsReused = task
         
         cell.photoImage.image = placeholderImage
     }

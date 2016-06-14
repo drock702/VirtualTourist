@@ -14,6 +14,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
 
     @IBOutlet weak var mapView: MKMapView!
     
+    var currentLocation: Location!
     var locations = [Location]()
     var index = 1       // DLP TEMP
     
@@ -146,7 +147,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         ]
         
         // Now we create a new Location, using the shared Context
-        _ = Location(dictionary: dictionary, context: sharedContext)
+        currentLocation = Location(dictionary: dictionary, context: sharedContext)
         
         print ("The location is being saved lat: \(annotation.coordinate.latitude), lon: \(annotation.coordinate.longitude)")
         index++     // DLP TEMP
@@ -195,6 +196,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         let controller = (self.storyboard!.instantiateViewControllerWithIdentifier("LocationPhotoAlbumViewID") ) as! PhotoAlbumView
         controller.mapLatitude = latitude
         controller.mapLongitude = longitude
+        controller.currentLocation = currentLocation
         
         self.presentViewController(controller, animated: true, completion: nil)
         

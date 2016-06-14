@@ -19,6 +19,7 @@ class Photo : NSManagedObject {
         static let Height = "height_m"
         static let Width = "width_m"
         static let Title = "title"
+        static let Place = "place"
     }
     
     // 3. We are promoting these four from simple properties, to Core Data attributes
@@ -28,6 +29,7 @@ class Photo : NSManagedObject {
     @NSManaged var title: String
     @NSManaged var height: String
     @NSManaged var width: String
+    @NSManaged var place: Location?
     
     // 4. Include this standard Core Data init method.
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
