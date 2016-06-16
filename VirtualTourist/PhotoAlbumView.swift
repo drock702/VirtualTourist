@@ -55,6 +55,8 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         self.activityStatusIndicator.hidden = true
         self.newCollectionButton.enabled = false
         
+        // Does this allow the photos to be selected
+        self.collectionView.allowsSelection = true
         collectionView.dataSource = self
         // Configure the collection view.
         let screenSize = UIScreen.mainScreen().bounds
@@ -110,8 +112,6 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         // Are there any pictures to show?
         PhotoGrabber.sharedInstance().pictureSearchByLatitudeLongitude (self.mapLatitude, longitudeValue: self.mapLongitude) { (photos: [[String: AnyObject]]?, errorString: String?) in
             
-            self.locationPhotos = photos
-            print ("pictureSearchByLatitudeLongitude - lat: \(self.mapLatitude), lon: \(self.mapLongitude) returned \(self.locationPhotos!.count) photos")
             dispatch_async(dispatch_get_main_queue()) {
                 if let error = errorString {
                     print ("There was an error \(error)")
@@ -122,19 +122,22 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
                 }
             }
             
+            self.locationPhotos = photos
+            print ("pictureSearchByLatitudeLongitude - lat: \(self.mapLatitude), lon: \(self.mapLongitude) returned \(self.locationPhotos!.count) photos")
+            
             // End animation of status indicator
             self.activityStatusIndicator.hidden = true
             self.activityStatusIndicator.stopAnimating()
             // Enable the New Collection button
             
             self.newCollectionButton.enabled = true
-//            print ("Done retrieving  \(self.locationPhotos) photos ")
             
             // Get a photo to put in collection
             for photo in self.locationPhotos!
+//            for photo in self.fetchedResultsController.fetchedObjects as! [[String: AnyObject]] // self.locationPhotos!
             {
                 // Now we create a new Photo, using the shared Context
-                var newphoto = Photo(dictionary: photo, context: self.sharedContext)
+                let newphoto = Photo(dictionary: photo, context: self.sharedContext)
                 newphoto.place = self.currentLocation
                 
                 // Get the photo images
@@ -185,6 +188,8 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         
         let fetchRequest = NSFetchRequest(entityName: "Photo")
         fetchRequest.sortDescriptors = []
+        // Need to filter the photos y the location
+        fetchRequest.predicate = NSPredicate(format: "place == %@", self.currentLocation!)
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
@@ -231,6 +236,8 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
 
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+        
+        print("numberOfSectionsInCollectionView")
         return self.fetchedResultsController.sections?.count ?? 0
     }
     
@@ -254,9 +261,13 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         return cell
     }
     
+    
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        // DLP The tap is not working!!!
+        print ("Image tapped - index \(indexPath)")
         
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! PhotoCellForCollectionView
+
         
         // Whenever a cell is tapped we will toggle its presence in the selectedIndexes array
         if let index = selectedIndexes.indexOf(indexPath) {

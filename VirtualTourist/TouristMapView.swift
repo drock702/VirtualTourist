@@ -15,8 +15,6 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
     @IBOutlet weak var mapView: MKMapView!
     
     var currentLocation: Location!
-    var locations = [Location]()
-    var index = 1       // DLP TEMP
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,9 +32,6 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         do {
             try fetchedResultsController.performFetch()
         } catch {}
-        
-        locations = fetchAllEvents ()
-        print ("After fetching, #items: \(locations.count)")
 
         // Set the view controller as! the delegate
         fetchedResultsController.delegate = self
@@ -46,6 +41,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
     
     func fetchAllEvents() -> [Location] {
         
+        print ("Call fetchAllEvents!!\n\n")
         // Create the Fetch Request
         let fetchRequest = NSFetchRequest(entityName: "Location")
         //fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
@@ -65,7 +61,6 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
     }
     
     func loadSavedMapData () {
-        print ("There should be \(locations.count) items from saved data!")
         
         dispatch_async(dispatch_get_main_queue()) {
             print ("Create annotation")
@@ -73,8 +68,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
             // point annotations will be stored in this array, and then provided to the map view.
             var annotations = [MKPointAnnotation]()
             
-            print ("iterate locations")
-            for pinpoint in self.locations {
+            for pinpoint in self.fetchAllEvents() {
                 
                 print ("The location is being built lat: \(pinpoint.latitude), lon: \(pinpoint.longitude), name: \(pinpoint.name)")
                 // Notice that the float values are being used to create CLLocationDegree values.
@@ -147,10 +141,8 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         ]
         
         // Now we create a new Location, using the shared Context
-        currentLocation = Location(dictionary: dictionary, context: sharedContext)
+        _ = Location(dictionary: dictionary, context: sharedContext)
         
-        print ("The location is being saved lat: \(annotation.coordinate.latitude), lon: \(annotation.coordinate.longitude)")
-        index++     // DLP TEMP
         // Step 3: Do not add actors to the actors array.
         // This is no longer necessary once we are modifying our table through the
         // fetched results controller delefate methods
@@ -190,13 +182,21 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         let title = annotation.title
         mapView.deselectAnnotation(annotation, animated: true)
         
+        // find the pin that was tapped from lat and lon to get the pin
+        for pinpoint in self.fetchAllEvents () {
+            if (pinpoint.latitude == latitude && pinpoint.longitude == longitude)
+            {
+                self.currentLocation = pinpoint
+                break;
+            }
+        }
         
         // Launch the photo album view
-//        var controller: UIViewController
         let controller = (self.storyboard!.instantiateViewControllerWithIdentifier("LocationPhotoAlbumViewID") ) as! PhotoAlbumView
         controller.mapLatitude = latitude
         controller.mapLongitude = longitude
         controller.currentLocation = currentLocation
+        print ("The current locaiton \(self.currentLocation)")
         
         self.presentViewController(controller, animated: true, completion: nil)
         

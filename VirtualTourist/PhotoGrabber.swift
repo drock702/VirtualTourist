@@ -333,59 +333,6 @@ class PhotoGrabber : NSObject {
             }
             
             completionHandler(imageData: data, errorString: nil)
-            
-//            /* Parse the data! */
-//            let parsedResult: AnyObject!
-//            do {
-//                parsedResult = try NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments)
-//            } catch {
-//                parsedResult = nil
-//                print("Could not parse the data as JSON: '\(data)'")
-//                 completionHandler(imageData: nil, errorString: "Could not parse the data as JSON: '\(data)'")
-//                return
-//            }
-//            
-//            /* GUARD: Did Flickr return an error (stat != ok)? */
-//            guard let stat = parsedResult["stat"] as? String where stat == "ok" else {
-//                print("Flickr API returned an error. See error code and message in \(parsedResult)")
-//                completionHandler (photos: nil, errorString: "Flickr API returned an error. See error code and message in \(parsedResult)")
-//                return
-//            }
-//            
-//            /* GUARD: Is the "photos" key in our result? */
-//            guard let photosDictionary = parsedResult["photos"] as? NSDictionary else {
-//                print("Cannot find key 'photos' in \(parsedResult)")
-//                completionHandler (photos: nil, errorString: "Cannot find key 'photos' in \(parsedResult)")
-//                return
-//            }
-//            
-//            /* GUARD: Is the "total" key in photosDictionary? */
-//            guard let totalPhotosVal = (photosDictionary["total"] as? NSString)?.integerValue else {
-//                print("Cannot find key 'total' in \(photosDictionary)")
-//                completionHandler (photos: nil, errorString: "Cannot find key 'total' in \(photosDictionary)")
-//                return
-//            }
-//            
-//            if totalPhotosVal > 0 {
-//                
-//                /* GUARD: Is the "photo" key in photosDictionary? */
-//                guard let photosArray = photosDictionary["photo"] as? [[String: AnyObject]] else {
-//                    print("Cannot find key 'photo' in \(photosDictionary)")
-//                    completionHandler (photos: nil, errorString: "Cannot find key 'photo' in \(photosDictionary)")
-//                    return
-//                }
-//                
-//                print ("totalPhotosVal = \(totalPhotosVal), found \(photosArray.count) pictures")
-//                // Photo array
-//                completionHandler (photos: photosArray, errorString: nil)
-//                
-//            } else {
-//                print ("No Photos Found. Search Again.")
-//                //                dispatch_async(dispatch_get_main_queue(), {
-//                //                    self.flickrPhotoTitle.text = "No Photos Found. Search Again."
-//                //                    self.flickrImage.image = nil
-//                //                })
-//            }
         }
         
         task.resume()
