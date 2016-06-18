@@ -39,25 +39,28 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         CoreDataStackManager.sharedInstance().saveContext()
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
-        
+    func photoRefresh () {
         // Start the fetched results controller
-        var error: NSError?
         do {
             try fetchedResultsController.performFetch()
-        } catch let error1 as NSError {
-            error = error1
+        } catch let error as NSError {
+            print("Error performing fetch \(error)")
         }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.photoRefresh ()
         
         self.activityStatusIndicator.hidden = true
         self.newCollectionButton.enabled = false
         
-        // Does this allow the photos to be selected
-        self.collectionView.allowsSelection = true
+        // Connect up delegates
+        collectionView.delegate = self
         collectionView.dataSource = self
+        fetchedResultsController.delegate = self
+        
         // Configure the collection view.
         let screenSize = UIScreen.mainScreen().bounds
         let layout = UICollectionViewFlowLayout()
@@ -66,8 +69,6 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         collectionView.setCollectionViewLayout(layout, animated: true)
-        
-        fetchedResultsController.delegate = self
     }
     
     override func didReceiveMemoryWarning() {
@@ -75,7 +76,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         // Dispose of any resources that can be recreated.
     }
     
-    func refreshPhotos ()
+    func retrieveFlickrPhotos ()
     {
         // Set pinpoint on map
         if self.mapLatitude < 200.0 && self.mapLongitude < 200.0
@@ -95,6 +96,12 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
             let location:CLLocationCoordinate2D = coordinate
             let region:MKCoordinateRegion = MKCoordinateRegionMake(location, span)
             
+            self.mapView.delegate = self
+            self.mapView.zoomEnabled = false
+            self.mapView.scrollEnabled = false
+            self.mapView.pitchEnabled = false
+            self.mapView.rotateEnabled = false
+            
             self.mapView.setRegion(region, animated: true)
             
             // Here we create the annotation and set its coordiate, title, and subtitle properties
@@ -104,37 +111,41 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
             self.mapView.addAnnotation(annotation)
         }
         
+        // Start the animation
         dispatch_async(dispatch_get_main_queue()) {
             self.activityStatusIndicator.hidden = false
             self.activityStatusIndicator.startAnimating()
         }
         
-        // Are there any pictures to show?
+        // Get pictures from Flickr to show
         PhotoGrabber.sharedInstance().pictureSearchByLatitudeLongitude (self.mapLatitude, longitudeValue: self.mapLongitude) { (photos: [[String: AnyObject]]?, errorString: String?) in
             
             dispatch_async(dispatch_get_main_queue()) {
+                var hidelabel = false
+                
                 if let error = errorString {
                     print ("There was an error \(error)")
-                    self.displayLabel.hidden = false
+                    hidelabel = false
                 }
                 else {
-                    self.displayLabel.hidden = true
+                    hidelabel = (photos?.count != 0)
                 }
+                print ("hidelabel \(hidelabel)")
+                self.displayLabel.hidden = hidelabel
+                
+                // End animation of status indicator
+                self.activityStatusIndicator.hidden = true
+                self.activityStatusIndicator.stopAnimating()
+                
+                // Enable the New Collection button
+                self.newCollectionButton.enabled = true
             }
             
             self.locationPhotos = photos
             print ("pictureSearchByLatitudeLongitude - lat: \(self.mapLatitude), lon: \(self.mapLongitude) returned \(self.locationPhotos!.count) photos")
             
-            // End animation of status indicator
-            self.activityStatusIndicator.hidden = true
-            self.activityStatusIndicator.stopAnimating()
-            // Enable the New Collection button
-            
-            self.newCollectionButton.enabled = true
-            
             // Get a photo to put in collection
             for photo in self.locationPhotos!
-//            for photo in self.fetchedResultsController.fetchedObjects as! [[String: AnyObject]] // self.locationPhotos!
             {
                 // Now we create a new Photo, using the shared Context
                 let newphoto = Photo(dictionary: photo, context: self.sharedContext)
@@ -152,10 +163,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
                     newphoto.image = image
                     self.saveContext()
                 }
-                
             }
-            // DLP - is this call necessary?
-            CoreDataStackManager.sharedInstance().saveContext()
         }
     }
     
@@ -164,22 +172,31 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         
         // Clear the collection?
         collectionView.reloadData()
-        self.refreshPhotos ()
+        self.retrieveFlickrPhotos ()
     }
     
     @IBAction func goBack(sender: UIBarButtonItem) {
         
         if((self.presentingViewController) != nil){
             self.dismissViewControllerAnimated(false, completion: nil)
-            
-            print("Done")
         }
     }
     
     @IBAction func newCollectionPress(sender: UIBarButtonItem) {
         print ("Create a new collection...")
         
-        self.refreshPhotos ()
+        dispatch_async(dispatch_get_main_queue()) {
+         
+            for photo in (self.currentLocation?.photos)! {
+                self.sharedContext.deleteObject(photo as! NSManagedObject)
+            }
+            
+            // Reset the array
+            self.currentLocation?.photos = NSOrderedSet ()
+            self.saveContext()
+            self.retrieveFlickrPhotos ()
+            self.collectionView.reloadData()
+        }
     }
     
     // MARK: - NSFetchedResultsController
@@ -195,7 +212,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         fetchedResultsController.delegate = self
         
         return fetchedResultsController
-        }()
+    }()
     
     func configureCell(cell: PhotoCellForCollectionView, photo: Photo) {
         var placeholderImage = UIImage(named: "PlaceholderImage")
@@ -211,8 +228,6 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
                 print("Photo image download error: \(error.localizedDescription)")
             }
             
-            print ("Retrieved a photo image" )
-            
             if let data = data {
                 // Create the image
                 let image = UIImage(data: data)
@@ -221,7 +236,6 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
                 photo.image = image
                 
                 // update the cell on the main thread
-                
                 dispatch_async(dispatch_get_main_queue()) {
                     cell.photoImage!.image = image
                 }
@@ -233,11 +247,9 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         
         cell.photoImage.image = placeholderImage
     }
-
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         
-        print("numberOfSectionsInCollectionView")
         return self.fetchedResultsController.sections?.count ?? 0
     }
     
@@ -254,7 +266,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         
-        print ("Get the cell at index \(indexPath) - the photo is \(photo.description)")
+//        print ("Get the cell at index \(indexPath) - the photo is \(photo.description)")
         
         self.configureCell(cell, photo: photo)
         
@@ -263,22 +275,12 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
     
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        // DLP The tap is not working!!!
-        print ("Image tapped - index \(indexPath)")
         
-        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! PhotoCellForCollectionView
-
-        
-        // Whenever a cell is tapped we will toggle its presence in the selectedIndexes array
-        if let index = selectedIndexes.indexOf(indexPath) {
-            selectedIndexes.removeAtIndex(index)
-        } else {
-            selectedIndexes.append(indexPath)
-        }
-        
-        // Then reconfigure the cell
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-        configureCell(cell, photo: photo)
+        sharedContext.deleteObject(photo)
+        saveContext()
+        self.photoRefresh ()
+        self.collectionView.reloadData()
         
         // And update the buttom button
         updateBottomButton()
@@ -286,6 +288,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
     
     func updateBottomButton () {
         
+        newCollectionButton.enabled = self.fetchedResultsController.fetchedObjects?.count > 0
     }
 
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
@@ -374,14 +377,10 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
                 blockOperation.start()
             }
             }, completion: { (finished) -> Void in
-                print("Calling to remove all")
+//                print("Calling to remove all")
                 self.blockOperations.removeAll(keepCapacity: false)
         })
         
-    }
-    
-    
-    @IBAction func NewCollectionButton(sender: UIBarButtonItem) {
     }
     
 }

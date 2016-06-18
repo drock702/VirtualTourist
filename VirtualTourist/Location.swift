@@ -23,7 +23,7 @@ class Location : NSManagedObject {
     @NSManaged var name: String
     @NSManaged var latitude: NSNumber
     @NSManaged var longitude: NSNumber
-    @NSManaged var photos: [Photo]
+    @NSManaged var photos: NSOrderedSet //[Photo]
     
     // 4. Include this standard Core Data init method.
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {

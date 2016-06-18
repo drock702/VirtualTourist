@@ -60,10 +60,6 @@ class PhotoGrabber : NSObject {
             
             let parsedPhotosResult = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.AllowFragments) as! NSDictionary
             
-            // Show the data returned
-            // DLP - Show the results
-//            print (parsedPhotosResult)
-            
             if let prePhotoArray = parsedPhotosResult.valueForKey("photos") as? [String: AnyObject]//NSDictionary
             {
                 var TotalNumOfPhotos = 0
@@ -212,16 +208,13 @@ class PhotoGrabber : NSObject {
                     return
                 }
                 
-                print ("totalPhotosVal = \(totalPhotosVal), found \(photosArray.count) pictures")
+//                print ("totalPhotosVal = \(totalPhotosVal), found \(photosArray.count) pictures")
+
                 // Photo array
                 completionHandler (photos: photosArray, errorString: nil)
                 
             } else {
                 print ("No Photos Found. Search Again.")
-//                dispatch_async(dispatch_get_main_queue(), {
-//                    self.flickrPhotoTitle.text = "No Photos Found. Search Again."
-//                    self.flickrImage.image = nil
-//                })
             }
         }
         
@@ -296,7 +289,7 @@ class PhotoGrabber : NSObject {
     func getPhotoImageFromDownload(photo: Photo, completionHandler: (imageData: NSData?, errorString: String?) -> Void) {
        
         let session = NSURLSession.sharedSession()
-        let urlString = BASE_URL + photo.url
+//        let urlString = BASE_URL + photo.url
 //        let url = NSURL(string: urlString)!
         let url = NSURL(string: photo.url)!
         let request = NSURLRequest(URL: url)

@@ -70,7 +70,6 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
             
             for pinpoint in self.fetchAllEvents() {
                 
-                print ("The location is being built lat: \(pinpoint.latitude), lon: \(pinpoint.longitude), name: \(pinpoint.name)")
                 // Notice that the float values are being used to create CLLocationDegree values.
                 // This is a version of the Double type.
                 let lat = CLLocationDegrees(pinpoint.latitude )
@@ -135,7 +134,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         print("Picked a location")
         
         let dictionary: [String : AnyObject] = [
-            Location.Keys.Name : "my temp point" + String (index),      // DLP TEMP
+            Location.Keys.Name : "Lat: " + String (annotation.coordinate.latitude) + "-Lon:" + String (annotation.coordinate.longitude),
             Location.Keys.Lon : annotation.coordinate.longitude,
             Location.Keys.Lat : annotation.coordinate.latitude
         ]
@@ -153,7 +152,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
     
     // MKMapViewDelegate
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
-        print ("Mapview delegate #1")
+
         let reuseId = "pin"
         
         var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
@@ -179,7 +178,6 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         guard let annotation = view.annotation else { /* no annotation */ return }
         let latitude = annotation.coordinate.latitude
         let longitude = annotation.coordinate.longitude
-        let title = annotation.title
         mapView.deselectAnnotation(annotation, animated: true)
         
         // find the pin that was tapped from lat and lon to get the pin
@@ -196,84 +194,14 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         controller.mapLatitude = latitude
         controller.mapLongitude = longitude
         controller.currentLocation = currentLocation
-        print ("The current locaiton \(self.currentLocation)")
         
         self.presentViewController(controller, animated: true, completion: nil)
-        
-        print ("Latitude \(latitude), Longitude \(longitude), title: \(title)")
-        print ("Mapview delegate #2")
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    // Step 7: You can implmement the delegate methods here. Or maybe above the table methods. Anywhere is fine.
-    func controllerWillChangeContext (controller: NSFetchedResultsController) {
-        //        self.tableView.beginUpdates()
-        print ("controllerWillChangeContext called")
-    }
-    
-    func controller(controller: NSFetchedResultsController,
-        didChangeSection sectionInfo: NSFetchedResultsSectionInfo,
-        atIndex sectionIndex: Int,
-        forChangeType type: NSFetchedResultsChangeType) {
-            
-            switch type {
-            case .Insert:
-                print ("Controller Insert type called")
-//                self.tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Fade)
-                
-            case .Delete:
-                print ("Controller Delete type called")
-//                self.tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Fade)
-                
-            default:
-                return
-            }
-    }
-    
-    //
-    // This is the most interesting method. Take particular note of way the that newIndexPath
-    // parameter gets unwrapped and put into an array literal: [newIndexPath!]
-    //
-    func controller(controller: NSFetchedResultsController,
-        didChangeObject anObject: AnyObject,
-        atIndexPath indexPath: NSIndexPath?,
-        forChangeType type: NSFetchedResultsChangeType,
-        newIndexPath: NSIndexPath?) {
-            
-            switch type {
-            case .Insert:
-                print ("Insert type called")
-//                tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
-                
-            case .Delete:
-                print ("Delete type called")
-//                tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
-                
-            case .Update:
-                print ("Update type called")
-//                let cell = tableView.cellForRowAtIndexPath(indexPath!) as! ActorTableViewCell
-//                let actor = controller.objectAtIndexPath(indexPath!) as! Person
-//                self.configureCell(cell, withActor: actor)
-                
-            case .Move:
-                print ("Move type called")
-//                tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
-//                tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
-                
-            default:
-                return
-            }
-    }
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-//        self.tableView.endUpdates()
-        print ("controllerDidChangeContent called")
-    }
-    
-
     
 }
 

@@ -138,6 +138,16 @@
                                     </barButtonItem>
                                 </items>
                             </toolbar>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dOB-tH-Gna">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <items>
+                                    <barButtonItem enabled="NO" title="New Collection" width="578" id="Xbl-p4-MSx" userLabel="New Collection">
+                                        <connections>
+                                            <action selector="newCollectionPress:" destination="W5Y-ab-mhA" id="rhx-4k-OoX"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -156,20 +166,14 @@
                             <constraint firstItem="4vV-jT-t53" firstAttribute="top" secondItem="Wv2-KO-cTC" secondAttribute="bottom" constant="3" id="xrX-XL-EnL"/>
                         </constraints>
                     </view>
-                    <toolbarItems>
-                        <barButtonItem enabled="NO" title="New Collection" width="579" id="eyv-55-aPh" userLabel="New Collection">
-                            <connections>
-                                <action selector="NewCollectionButton:" destination="W5Y-ab-mhA" id="jTU-Dz-Tve"/>
-                            </connections>
-                        </barButtonItem>
-                    </toolbarItems>
+                    <toolbarItems/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="activityStatusIndicator" destination="lla-80-I2F" id="alO-wt-h6n"/>
                         <outlet property="collectionView" destination="4vV-jT-t53" id="5SS-XQ-kea"/>
                         <outlet property="displayLabel" destination="Wv2-KO-cTC" id="LkK-sV-bcZ"/>
                         <outlet property="mapView" destination="f2y-d5-Q5C" id="T7Q-bg-Z6C"/>
-                        <outlet property="newCollectionButton" destination="eyv-55-aPh" id="M1e-zG-aQh"/>
+                        <outlet property="newCollectionButton" destination="Xbl-p4-MSx" id="VZ6-QC-sKg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Nwl-of-EV8" userLabel="First Responder" sceneMemberID="firstResponder"/>

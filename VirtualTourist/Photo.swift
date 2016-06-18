@@ -24,7 +24,6 @@ class Photo : NSManagedObject {
     
     // 3. We are promoting these four from simple properties, to Core Data attributes
     @NSManaged var url: String
-//    @NSManaged var location: Location?
     @NSManaged var id: String
     @NSManaged var title: String
     @NSManaged var height: String
@@ -63,8 +62,6 @@ class Photo : NSManagedObject {
         title = dictionary[Keys.Title] as! String!
         height = dictionary[Keys.Height] as! String!
         width = dictionary[Keys.Width] as! String!
-        // DLP - Any reason to store the location?
-//        location = newLocation
     }
     
     var image: UIImage? {
