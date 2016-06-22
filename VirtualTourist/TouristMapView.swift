@@ -39,9 +39,9 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         // Add the map location
     }
     
-    func fetchAllEvents() -> [Location] {
+    func fetchAllLocations() -> [Location] {
         
-        print ("Call fetchAllEvents!!\n\n")
+        print ("Call fetchAllLocations!!\n\n")
         // Create the Fetch Request
         let fetchRequest = NSFetchRequest(entityName: "Location")
         //fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
@@ -68,7 +68,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
             // point annotations will be stored in this array, and then provided to the map view.
             var annotations = [MKPointAnnotation]()
             
-            for pinpoint in self.fetchAllEvents() {
+            for pinpoint in self.fetchAllLocations() {
                 
                 // Notice that the float values are being used to create CLLocationDegree values.
                 // This is a version of the Double type.
@@ -181,7 +181,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         mapView.deselectAnnotation(annotation, animated: true)
         
         // find the pin that was tapped from lat and lon to get the pin
-        for pinpoint in self.fetchAllEvents () {
+        for pinpoint in self.fetchAllLocations () {
             if (pinpoint.latitude == latitude && pinpoint.longitude == longitude)
             {
                 self.currentLocation = pinpoint

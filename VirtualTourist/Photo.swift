@@ -30,6 +30,16 @@ class Photo : NSManagedObject {
     @NSManaged var width: String
     @NSManaged var place: Location?
     
+    var image: UIImage? {
+        get {
+            return ImageCache.sharedInstance().imageWithIdentifier(id)
+        }
+        
+        set {
+            ImageCache.sharedInstance().storeImage(newValue, withIdentifier: id)
+        }
+    }
+    
     // 4. Include this standard Core Data init method.
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -57,21 +67,27 @@ class Photo : NSManagedObject {
         
         // After the Core Data work has been taken care of we can init the properties from the
         // dictionary. This works in the same way that it did before we started on Core Data
-        url = dictionary[Keys.Url] as! String
+        url = dictionary[Keys.Url] as! String!
         id = dictionary[Keys.Photo_id] as! String!
         title = dictionary[Keys.Title] as! String!
         height = dictionary[Keys.Height] as! String!
         width = dictionary[Keys.Width] as! String!
     }
     
-    var image: UIImage? {
-        get {
-            return ImageCache.sharedInstance().imageWithIdentifier(id)
+    override func prepareForDeletion() {
+        super.prepareForDeletion()
+        
+        let path = ImageCache.sharedInstance().pathForIdentifier(self.id)
+        print ("Delete path: \(path)")
+        
+        // Delete the photo
+        let fileManager = NSFileManager.defaultManager()
+        do {
+        try fileManager.removeItemAtPath(path)
+        } catch {
+            print ("Error removing \(path)")
         }
         
-        set {
-            ImageCache.sharedInstance().storeImage(newValue, withIdentifier: id)
-        }
     }
 }
 

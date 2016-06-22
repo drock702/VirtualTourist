@@ -1,5 +1,5 @@
 //
-//  PhotoGrabber.swift
+//  FlickrClient.swift
 //  VirtualTourist
 //
 //  Created by Derrick Price on 4/2/16.
@@ -26,17 +26,10 @@ let LAT_MAX = 90.0
 let LON_MIN = -180.0
 let LON_MAX = 180.0
 
-class PhotoGrabber : NSObject {
+class FlickrClient : NSObject {
     
     // Shared Instance
-    class func sharedInstance() -> PhotoGrabber {
-        
-        struct Singleton {
-            static var sharedInstance = PhotoGrabber()
-        }
-        
-        return Singleton.sharedInstance
-    }
+    static let sharedInstance = FlickrClient ()
     
     // Create the flickr search with the given arguments
     func doFlickrSearchWithArguments(methodArguments: [String : AnyObject], completionHandler: (photos: [[String: AnyObject]]?, errorString: String?) -> Void) {
@@ -263,7 +256,8 @@ class PhotoGrabber : NSObject {
         [
             "method": METHOD_NAME,
             "api_key": API_KEY,
-            "bbox": createBoundingBoxString(latitudeValue, lon: longitudeValue),
+            "lat": String (latitudeValue),
+            "lon": String (longitudeValue),
             "format": DATA_FORMAT,
             "extras":EXTRAS,
             "nojsoncallback": NO_JSON_CALLBACK,
@@ -329,17 +323,6 @@ class PhotoGrabber : NSObject {
         }
         
         task.resume()
-    }
-    
-    func createBoundingBoxString(lat: Double, lon: Double) -> String {
-        
-        /* Fix added to ensure box is bounded by minimum and maximums */
-        let bottom_left_lon = max(lon - BOUNDING_BOX_HALF_WIDTH, LON_MIN)
-        let bottom_left_lat = max(lat - BOUNDING_BOX_HALF_HEIGHT, LAT_MIN)
-        let top_right_lon = min(lon + BOUNDING_BOX_HALF_HEIGHT, LON_MAX)
-        let top_right_lat = min(lat + BOUNDING_BOX_HALF_HEIGHT, LAT_MAX)
-        
-        return "\(bottom_left_lon),\(bottom_left_lat),\(top_right_lon),\(top_right_lat)"
     }
 }
 
