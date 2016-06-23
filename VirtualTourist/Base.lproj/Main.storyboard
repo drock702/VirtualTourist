@@ -138,10 +138,10 @@
                                     </barButtonItem>
                                 </items>
                             </toolbar>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dOB-tH-Gna">
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dOB-tH-Gna">
                                 <rect key="frame" x="0.0" y="556" width="600" height="44"/>
                                 <items>
-                                    <barButtonItem enabled="NO" title="New Collection" width="578" id="Xbl-p4-MSx" userLabel="New Collection">
+                                    <barButtonItem enabled="NO" title="New Collection" width="387" id="Xbl-p4-MSx" userLabel="New Collection">
                                         <connections>
                                             <action selector="newCollectionPress:" destination="W5Y-ab-mhA" id="rhx-4k-OoX"/>
                                         </connections>
@@ -157,17 +157,20 @@
                             <constraint firstItem="4vV-jT-t53" firstAttribute="top" secondItem="f2y-d5-Q5C" secondAttribute="bottom" constant="52" id="Rq5-gf-nNm"/>
                             <constraint firstItem="IUO-a3-GZ4" firstAttribute="leading" secondItem="s3M-Jo-9tR" secondAttribute="leading" id="S95-SI-qoS"/>
                             <constraint firstItem="IUO-a3-GZ4" firstAttribute="trailing" secondItem="f2y-d5-Q5C" secondAttribute="trailing" id="StP-S3-fuK"/>
-                            <constraint firstItem="4vV-jT-t53" firstAttribute="bottom" secondItem="36y-WY-04g" secondAttribute="top" id="WoV-NX-BJ1"/>
+                            <constraint firstItem="dOB-tH-Gna" firstAttribute="top" secondItem="4vV-jT-t53" secondAttribute="bottom" id="W3u-Lq-Avm"/>
+                            <constraint firstItem="4vV-jT-t53" firstAttribute="bottom" secondItem="36y-WY-04g" secondAttribute="top" constant="-44" id="WoV-NX-BJ1"/>
                             <constraint firstItem="IUO-a3-GZ4" firstAttribute="top" secondItem="s3M-Jo-9tR" secondAttribute="topMargin" constant="30" id="ano-J0-i6O"/>
+                            <constraint firstItem="dOB-tH-Gna" firstAttribute="trailing" secondItem="4vV-jT-t53" secondAttribute="trailing" id="gJT-f6-xJ1"/>
                             <constraint firstItem="4vV-jT-t53" firstAttribute="trailing" secondItem="Wv2-KO-cTC" secondAttribute="trailing" id="gg2-eV-6vj"/>
                             <constraint firstItem="Wv2-KO-cTC" firstAttribute="leading" secondItem="4vV-jT-t53" secondAttribute="leading" id="lqU-QI-GdE"/>
+                            <constraint firstItem="dOB-tH-Gna" firstAttribute="leading" secondItem="4vV-jT-t53" secondAttribute="leading" id="qXB-bo-RhW"/>
                             <constraint firstItem="IUO-a3-GZ4" firstAttribute="leading" secondItem="f2y-d5-Q5C" secondAttribute="leading" id="wC7-yU-BfX"/>
                             <constraint firstItem="f2y-d5-Q5C" firstAttribute="top" secondItem="IUO-a3-GZ4" secondAttribute="bottom" id="wRO-Jb-ZrV"/>
                             <constraint firstItem="4vV-jT-t53" firstAttribute="top" secondItem="Wv2-KO-cTC" secondAttribute="bottom" constant="3" id="xrX-XL-EnL"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="activityStatusIndicator" destination="lla-80-I2F" id="alO-wt-h6n"/>
                         <outlet property="collectionView" destination="4vV-jT-t53" id="5SS-XQ-kea"/>

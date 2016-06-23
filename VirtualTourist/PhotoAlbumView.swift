@@ -317,7 +317,7 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         print("Delete didSelectItemAtIndexPath")
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         sharedContext.deleteObject(photo)
-//        saveContext()
+        saveContext()
         self.photoRefresh ()
         self.collectionView.reloadData()
     }
