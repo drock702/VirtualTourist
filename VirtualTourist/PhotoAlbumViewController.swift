@@ -1,5 +1,5 @@
 //
-//  PhotoAlbumView.swift
+//  PhotoAlbumViewController.swift
 //  Virtual Tourist
 //
 //  Created by Derrick Price on 3/12/16.
@@ -10,7 +10,7 @@ import CoreData
 import Foundation
 import MapKit
 
-class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+class PhotoAlbumViewController : UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var displayLabel: UILabel!
@@ -159,13 +159,9 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
                         
                         let image = UIImage(data: imageData)
                         newphoto.image = image
-                        
-//                        dispatch_async(dispatch_get_main_queue()) {
-//                            
-//                            self.saveContext()
-//                        }
                     }
                 }
+                self.saveContext()
             }
             
             dispatch_async(dispatch_get_main_queue()) {
@@ -193,10 +189,6 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
     
     @IBAction func newCollectionPress(sender: UIBarButtonItem) {
         print ("Create a new collection...")
-         
-//        for photo in (self.currentLocation?.photos)! {
-//            self.sharedContext.deleteObject(photo as! NSManagedObject)
-//        }
         
         // Delete current photos from the album
         for photo in fetchedResultsController.sections![0].objects as! [Photo] {
@@ -303,9 +295,6 @@ class PhotoAlbumView : UIViewController, UICollectionViewDataSource, UICollectio
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCellForCollectionView", forIndexPath: indexPath) as! PhotoCellForCollectionView
         
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-        
-//        print ("Get the cell at index \(indexPath) - the photo is \(photo.description)")
-        
         self.configureCell(cell, photo: photo)
         
         return cell

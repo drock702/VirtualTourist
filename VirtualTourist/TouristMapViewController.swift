@@ -1,5 +1,5 @@
 //
-//  TouristMapView.swift
+//  TouristMapViewController.swift
 //  Virtual Tourist
 //
 //  Created by Derrick Price on 3/12/16.
@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
+class TouristMapViewController : UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     
@@ -190,7 +190,7 @@ class TouristMapView : UIViewController, MKMapViewDelegate, NSFetchedResultsCont
         }
         
         // Launch the photo album view
-        let controller = (self.storyboard!.instantiateViewControllerWithIdentifier("LocationPhotoAlbumViewID") ) as! PhotoAlbumView
+        let controller = (self.storyboard!.instantiateViewControllerWithIdentifier("LocationPhotoAlbumViewID") ) as! PhotoAlbumViewController
         controller.mapLatitude = latitude
         controller.mapLongitude = longitude
         controller.currentLocation = currentLocation
